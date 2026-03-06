@@ -862,7 +862,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeTip();}
 <script>
 async function loadCriptoPrecios() {
   try {
-    const d = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true').then(r=>r.json());
+    let d=null;try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');if(r.ok){const j=await r.json();if(j&&j.bitcoin)d=j;}}catch(e){}if(!d)try{const r=await fetch('https://api.coincap.io/v2/assets?ids=bitcoin,ethereum,solana');if(r.ok){const j=await r.json();if(j&&j.data){d={};j.data.forEach(c=>{d[c.id]={usd:parseFloat(c.priceUsd),usd_24h_change:parseFloat(c.changePercent24Hr)};});}}}catch(e){}if(!d)try{const rs=await Promise.all(['btc-bitcoin','eth-ethereum','sol-solana'].map(id=>fetch('https://api.coinpaprika.com/v1/tickers/'+id+'?quotes=USD').then(r=>r.json())));d={bitcoin:{usd:rs[0].quotes.USD.price,usd_24h_change:rs[0].quotes.USD.percent_change_24h},ethereum:{usd:rs[1].quotes.USD.price,usd_24h_change:rs[1].quotes.USD.percent_change_24h},solana:{usd:rs[2].quotes.USD.price,usd_24h_change:rs[2].quotes.USD.percent_change_24h}};}catch(e){}
     const coins = {bitcoin:{id:'btc',name:'Bitcoin'},ethereum:{id:'eth',name:'Ethereum'},solana:{id:'sol',name:'Solana'}};
     for (const [key,info] of Object.entries(coins)) {
       if (!d[key]) continue;
